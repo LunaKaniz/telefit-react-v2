@@ -171,7 +171,6 @@ export default function Login() {
         className="mt-5 text-center flex flex-col items-center"
       >
         <h3 className="text-sm mb-2">Or log in with Telegram</h3>
-        {/* The Telegram login button will be inserted here by the script */}
       </div>
     </div>
   );
