@@ -2,7 +2,6 @@ import TelegramBot from "node-telegram-bot-api";
 import axios from "axios";
 import FormData from "form-data";
 import { adminDb, admin } from "../../src/config/firebaseAdmin";
-//import { FieldValue } from 'firebase-admin/firestore'; // Import FieldValue
 
 // Initialize the bot with webhooks
 console.log("Initializing bot with webhook...");
@@ -42,19 +41,37 @@ const saveFoodItems = async (chatId) => {
 // Webhook handler
 export const handler = async (event) => {
   try {
-    const body = JSON.parse(event.body);
-    if (body.message) {
-      await handleMessage(body.message);
-    } else if (body.callback_query) {
-      await handleCallbackQuery(body.callback_query);
-    }
-    return { statusCode: 200, body: "Webhook received" };
+      if (!event.body) {
+          console.error('Webhook event body is missing');
+          return {
+              statusCode: 400,
+              body: 'Bad Request: No event body',
+          };
+      }
+
+      const body = JSON.parse(event.body);
+      
+      if (!body) {
+          console.error('Parsed body is empty or invalid');
+          return {
+              statusCode: 400,
+              body: 'Bad Request: Invalid JSON body',
+          };
+      }
+
+      if (body.message) {
+          await handleMessage(body.message);
+      } else if (body.callback_query) {
+          await handleCallbackQuery(body.callback_query);
+      }
+
+      return { statusCode: 200, body: 'Webhook received' };
   } catch (error) {
-    console.error("Error processing webhook:", error);
-    return {
-      statusCode: 500,
-      body: "Internal Server Error",
-    };
+      console.error('Error processing webhook:', error);
+      return {
+          statusCode: 500,
+          body: 'Internal Server Error',
+      };
   }
 };
 
